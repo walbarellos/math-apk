@@ -1,0 +1,16 @@
+Primeiro o gabarito completo com nota, depois gero todos os arquivos do app.Agora os arquivos do app:11 arquivos entregues. Resumo rápido do que é cada um:
+
+**C++ (motor puro, sem arredondamento):**
+- `BaseConverter.h / .cpp` — toda a matemática: divisões sucessivas, parte fracionária com detecção de dízima periódica, avaliador de expressões recursivo
+- `jni_bridge.cpp` — converte os resultados C++ em JSON e entrega pro Kotlin
+- `CMakeLists.txt` — configura o NDK pra compilar pra `arm64` (celular real) e `x86_64` (emulador)
+
+**Kotlin / Compose:**
+- `CalcModels.kt` — data classes do resultado (BaseEntry, CalcResult, estado da UI)
+- `CalcViewModel.kt` — chama o C++, faz parse do JSON, gerencia estado
+- `CalculatorScreen.kt` — UI completa em Compose: teclado + cartões coloridos por base + passos expansíveis
+- `MainActivity.kt` — entrada do app
+
+**Para rodar:** abra no Android Studio, instale NDK + CMake pelo SDK Manager, conecte o celular e clique Run. O README dentro da pasta tem o passo a passo completo.
+
+**Sobre a sua nota:** 8,5/10 — a metodologia tá certíssima. O único problema foi o exercício c) da lista 2, mas o erro é do enunciado (dígito 7 não existe em base 4), não seu.

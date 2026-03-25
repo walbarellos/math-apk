@@ -1,0 +1,70 @@
+[
+    {
+        "merged": "com.basecalc.app-debug-55:/mipmap-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.basecalc.app-main-57:/mipmap-xhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.basecalc.app-debug-55:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.basecalc.app-main-57:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.basecalc.app-debug-55:/mipmap-mdpi_ic_launcher_foreground.png.flat",
+        "source": "com.basecalc.app-main-57:/mipmap-mdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.basecalc.app-debug-55:/mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.basecalc.app-main-57:/mipmap-xxxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.basecalc.app-debug-55:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.basecalc.app-main-57:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.basecalc.app-debug-55:/mipmap-hdpi_ic_launcher_foreground.png.flat",
+        "source": "com.basecalc.app-main-57:/mipmap-hdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.basecalc.app-debug-55:/mipmap-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.basecalc.app-main-57:/mipmap-xxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-debug-55:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "/home/walbarellos/.gradle/daemon/8.7/com.basecalc.app-main-57:/mipmap-xxhdpi/ic_launcher_round.png"
+    }
+]
