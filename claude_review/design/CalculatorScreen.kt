@@ -44,6 +44,7 @@ import com.basecalc.*
 import com.basecalc.core.conversion.StepsFormatter
 import com.basecalc.core.model.BaseEntry
 import com.basecalc.core.model.CalcResult
+import com.basecalc.core.number.ConjuntoNumerico
 import com.basecalc.core.util.DigitSymbols
 import java.math.BigInteger
 
@@ -284,6 +285,33 @@ private fun PainelResultados(
     }
 }
 
+// ─── Badge de Conjunto Numérico ───────────────────────────────────────────────
+
+@Composable
+private fun BadgeConjunto(conjunto: ConjuntoNumerico) {
+    val corConjunto = when (conjunto) {
+        ConjuntoNumerico.NATURAL -> Color(0xFF2196F3)
+        ConjuntoNumerico.INTEIRO -> Color(0xFF4CAF50)
+        ConjuntoNumerico.RACIONAL -> Color(0xFFFF9800)
+        ConjuntoNumerico.IRRACIONAL -> Color(0xFFE91E63)
+        ConjuntoNumerico.REAL -> Color(0xFF9C27B0)
+    }
+    
+    Surface(
+        shape = RoundedCornerShape(4.dp),
+        color = corConjunto.copy(alpha = 0.15f),
+    ) {
+        Text(
+            text = "${conjunto.simbolo} ⊂ ${ConjuntoNumerico.REAL.simbolo}",
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.SemiBold,
+            ),
+            color = corConjunto,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+    }
+}
+
 // ─── Cartão de base ───────────────────────────────────────────────────────────
 
 @Composable
@@ -343,6 +371,10 @@ private fun CartaoBase(
                             modifier = Modifier.padding(start = 3.dp),
                         )
                     }
+                }
+                if (entrada.base == 10) {
+                    Spacer(Modifier.height(4.dp))
+                    BadgeConjunto(entrada.conjunto)
                 }
             } else {
                 Text(
@@ -857,7 +889,7 @@ private val layoutTeclado = listOf(
     listOf("7", "8", "9", "*"),
     listOf("4", "5", "6", "-"),
     listOf("1", "2", "3", "+"),
-    listOf("0", ".", "="),
+    listOf("0", ".", "^", "="),
 )
 
 @Composable
@@ -893,7 +925,7 @@ private fun PainelTeclado(
 
 @Composable
 private fun TeclaCalc(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val ehOperador = label in setOf("+", "-", "*", "/", "%", "⌫", "AC")
+    val ehOperador = label in setOf("+", "-", "*", "/", "%", "^", "⌫", "AC")
     val ehIgual = label == "="
 
     Button(

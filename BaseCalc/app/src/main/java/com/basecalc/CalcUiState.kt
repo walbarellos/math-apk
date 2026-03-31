@@ -1,9 +1,61 @@
 package com.basecalc
 
 import com.basecalc.core.model.CalcResult
+import com.basecalc.core.logica.TabelaVerdade
+
+/** Resultado de operação com conjuntos. */
+data class ConjuntoResultado(
+    val elementos: Set<String>,
+    val passos: List<String>,
+    val elementosA: Set<String>,
+    val elementosB: Set<String>,
+    val elementosApenasA: Set<String>,
+    val elementosApenasB: Set<String>,
+    val elementosComuns: Set<String>,
+)
+
+/** Passo de operação matricial. */
+data class PassoMatriz(
+    val descricao: String,
+    val linhaDestaque: Int = -1,
+    val colunaDestaque: Int = -1,
+)
+
+/** Estado do módulo de lógica proposicional. */
+data class LogicaUiState(
+    val formula: String = "",
+    val tabela: TabelaVerdade? = null,
+    val erro: String? = null,
+)
+
+/** Estado do módulo de conjuntos. */
+data class ConjuntosUiState(
+    val inputA: String = "",
+    val inputB: String = "",
+    val universo: String = "",
+    val operacao: OperacaoConjunto = OperacaoConjunto.UNIAO,
+    val resultado: ConjuntoResultado? = null,
+)
+
+/** Estado do módulo de matrizes. */
+data class MatrizesUiState(
+    val linhas: Int = 2,
+    val colunas: Int = 2,
+    val matrizA: List<List<String>> = List(2) { List(2) { "0" } },
+    val matrizB: List<List<String>> = List(2) { List(2) { "0" } },
+    val operacao: OperacaoMatriz = OperacaoMatriz.MULTIPLICACAO,
+    val passos: List<PassoMatriz> = emptyList(),
+    val resultado: List<List<String>> = emptyList(),
+)
 
 /** Abas de navegação do app. */
-enum class AppTab { CALCULADORA, GRAFICO, HISTORICO }
+enum class AppTab { CALCULADORA, LOGICA, CONJUNTOS, MATRIZES, GRAFICO, HISTORICO }
+
+/** Operações de teoria dos conjuntos. */
+enum class OperacaoConjunto { UNIAO, INTERSECCAO, DIFERENCA, COMPLEMENTO }
+
+/** Operações com matrizes. */
+enum class OperacaoMatriz { MULTIPLICACAO, DETERMINANTE, TRANSPOSTA, INVERSA }
 
 /** Modo de cores da interface. */
 enum class ColorMode { PADRAO, ALTO_CONTRASTE, DALTONISMO }
@@ -50,6 +102,21 @@ data class CalcUiState(
 
     /** Modo de cores selecionado pelo usuário. */
     val colorMode: ColorMode = ColorMode.PADRAO,
+
+    /** Base de entrada para os números digitados (2–16). */
+    val inputBase: Int = 10,
+
+    /** Estado do módulo conjuntos. */
+    val conjuntosState: ConjuntosUiState = ConjuntosUiState(),
+
+    /** Estado do módulo matrizes. */
+    val matrizesState: MatrizesUiState = MatrizesUiState(),
+
+    /** Estado do módulo de lógica proposicional. */
+    val logicaState: LogicaUiState = LogicaUiState(),
+
+    /** Modo "cola discreta" - tema escuro OLED, fontes menores */
+    val modoDiscreta: Boolean = false,
 ) {
     companion object {
         const val MAX_HISTORICO = 50

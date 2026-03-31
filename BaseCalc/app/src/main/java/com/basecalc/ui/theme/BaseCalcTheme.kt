@@ -4,9 +4,46 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import com.basecalc.ColorMode
+
+// ─── Paleta OLED (Modo Cola Discreta) ───────────────────────────────────────────
+
+private val CoresOled = darkColorScheme(
+    primary = Color(0xFF555555),
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFF222222),
+    onPrimaryContainer = Color(0xFFCCCCCC),
+    secondary = Color(0xFF666666),
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFF1A1A1A),
+    onSecondaryContainer = Color(0xFFBBBBBB),
+    surface = Color(0xFF0A0A0A),
+    surfaceVariant = Color(0xFF111111),
+    onSurface = Color(0xFFAAAAAA),
+    onSurfaceVariant = Color(0xFF888888),
+    background = Color.Black,
+    onBackground = Color(0xFFCCCCCC),
+    error = Color(0xFFFF6B6B),
+    onError = Color.Black,
+)
+
+// ─── Typography para Modo Discreta ───────────────────────────────────────────────
+
+private val TypographyDiscreta = Typography(
+    headlineMedium = TextStyle(fontSize = 24.sp),
+    titleLarge = TextStyle(fontSize = 13.sp),
+    titleMedium = TextStyle(fontSize = 12.sp),
+    bodyMedium = TextStyle(fontSize = 10.sp),
+    bodySmall = TextStyle(fontSize = 9.sp),
+    labelSmall = TextStyle(fontSize = 8.sp),
+    labelMedium = TextStyle(fontSize = 9.sp),
+    labelLarge = TextStyle(fontSize = 10.sp),
+)
 
 // ─── Paleta clara ─────────────────────────────────────────────────────────────
 
@@ -129,18 +166,24 @@ private val CoresEscuroDaltonismo = darkColorScheme(
 @Composable
 fun BaseCalcTheme(
     colorMode: ColorMode = ColorMode.PADRAO,
+    modoDiscreta: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val dark = isSystemInDarkTheme()
-    val scheme = when (colorMode) {
-        ColorMode.PADRAO -> if (dark) CoresEscuro else CoresClaro
-        ColorMode.ALTO_CONTRASTE -> if (dark) CoresEscuroAltoContraste else CoresClaroAltoContraste
-        ColorMode.DALTONISMO -> if (dark) CoresEscuroDaltonismo else CoresClaroDaltonismo
+    
+    val scheme = when {
+        modoDiscreta -> CoresOled
+        colorMode == ColorMode.PADRAO -> if (dark) CoresEscuro else CoresClaro
+        colorMode == ColorMode.ALTO_CONTRASTE -> if (dark) CoresEscuroAltoContraste else CoresClaroAltoContraste
+        colorMode == ColorMode.DALTONISMO -> if (dark) CoresEscuroDaltonismo else CoresClaroDaltonismo
+        else -> if (dark) CoresEscuro else CoresClaro
     }
+
+    val typography = if (modoDiscreta) TypographyDiscreta else Typography
 
     MaterialTheme(
         colorScheme = scheme,
-        typography = Typography,
+        typography = typography,
         content = content,
     )
 }

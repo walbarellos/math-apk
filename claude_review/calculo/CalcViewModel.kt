@@ -26,7 +26,7 @@ class CalcViewModel(
     private val _uiState = MutableStateFlow(CalcUiState())
     val uiState: StateFlow<CalcUiState> = _uiState
 
-    private val operadores = setOf("+", "-", "*", "/", "%")
+    private val operadores = setOf("+", "-", "*", "/", "%", "^")
     private val cacheLock = Any()
     private val cache = object : LinkedHashMap<String, com.basecalc.core.model.CalcResult>(50, 0.75f, true) {
         override fun removeEldestEntry(
