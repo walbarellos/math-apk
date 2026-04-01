@@ -48,8 +48,18 @@ data class MatrizesUiState(
     val resultado: List<List<String>> = emptyList(),
 )
 
+/** Estado do módulo de potenciação e radiciação. */
+data class PotenciacaoUiState(
+    val base: String = "",
+    val expoente: String = "",
+    val raiz: String = "",
+    val indice: String = "",
+    val resultado: String = "",
+    val passos: List<String> = emptyList(),
+)
+
 /** Abas de navegação do app. */
-enum class AppTab { CALCULADORA, LOGICA, CONJUNTOS, MATRIZES, GRAFICO, HISTORICO }
+enum class AppTab { CALCULADORA, LOGICA, CONJUNTOS, MATRIZES, POTENCIACAO, GRAFICO, HISTORICO }
 
 /** Operações de teoria dos conjuntos. */
 enum class OperacaoConjunto { UNIAO, INTERSECCAO, DIFERENCA, COMPLEMENTO }
@@ -117,6 +127,9 @@ data class CalcUiState(
 
     /** Modo "cola discreta" - tema escuro OLED, fontes menores */
     val modoDiscreta: Boolean = false,
+
+    /** Estado do módulo de potenciação/radiciação */
+    val potenciacaoState: PotenciacaoUiState = PotenciacaoUiState(),
 ) {
     companion object {
         const val MAX_HISTORICO = 50

@@ -29,6 +29,11 @@ class CalcViewModel(
     private val _uiState = MutableStateFlow(CalcUiState())
     val uiState: StateFlow<CalcUiState> = _uiState
 
+    // ViewModel para o módulo de Conjuntos (do pacote do Claude)
+    val conjuntoViewModel: com.basecalc.conjuntos.ConjuntoViewModel by lazy {
+        com.basecalc.conjuntos.ConjuntoViewModel()
+    }
+
     private val operadores = setOf("+", "-", "*", "/", "%", "^")
     private val cacheLock = Any()
     private val cache = object : LinkedHashMap<String, com.basecalc.core.model.CalcResult>(50, 0.75f, true) {
@@ -513,5 +518,160 @@ class CalcViewModel(
                 )
             )
         }
+    }
+
+    // ─── Potenciação e Radiciação ─────────────────────────────────────────────────
+
+    fun setPotenciacaoBase(v: String) {
+        _uiState.value = _uiState.value.copy(
+            potenciacaoState = _uiState.value.potenciacaoState.copy(base = v)
+        )
+    }
+
+    fun setPotenciacaoExpoente(v: String) {
+        _uiState.value = _uiState.value.copy(
+            potenciacaoState = _uiState.value.potenciacaoState.copy(expoente = v)
+        )
+    }
+
+    fun setPotenciacaoRaiz(v: String) {
+        _uiState.value = _uiState.value.copy(
+            potenciacaoState = _uiState.value.potenciacaoState.copy(raiz = v)
+        )
+    }
+
+    fun setPotenciacaoIndice(v: String) {
+        _uiState.value = _uiState.value.copy(
+            potenciacaoState = _uiState.value.potenciacaoState.copy(indice = v)
+        )
+    }
+
+    fun calcularPotencia() {
+        val s = _uiState.value.potenciacaoState
+        if (s.base.isBlank() || s.expoente.isBlank()) return
+
+        val base = s.base.toLongOrNull() ?: return
+        val exp = s.expoente.toIntOrNull() ?: return
+
+        if (exp < 0) {
+            _uiState.value = _uiState.value.copy(
+                potenciacaoState = s.copy(
+                    resultado = "Expoente negativo não suportado",
+                    passos = listOf("Expoente negativo resultaria em fração"),
+                )
+            )
+            return
+        }
+
+        val passos = mutableListOf<String>()
+        passos.add("Calculando $base^$exp")
+
+        var resultado = 1L
+        val fatores = mutableListOf<String>()
+
+        if (exp == 0) {
+            passos.add("Qualquer número elevado a 0 = 1")
+            resultado = 1
+        } else if (exp == 1) {
+            passos.add("$base^1 = $base")
+            resultado = base
+        } else {
+            fatores.add("$base")
+            for (i in 2..exp) {
+                fatores.add("$base")
+                resultado *= base
+            }
+            passos.add("Expansão: ${fatores.joinToString(" × ")}")
+            passos.add("Multiplicando: $resultado")
+        }
+
+        _uiState.value = _uiState.value.copy(
+            potenciacaoState = s.copy(
+                resultado = resultado.toString(),
+                passos = passos,
+            )
+        )
+    }
+
+    fun calcularRadiciacao() {
+        val s = _uiState.value.potenciacaoState
+        if (s.raiz.isBlank() || s.indice.isBlank()) return
+
+        val radicando = s.raiz.toLongOrNull() ?: return
+        val indice = s.indice.toIntOrNull() ?: return
+
+        if (indice <= 0) {
+            _uiState.value = _uiState.value.copy(
+                potenciacaoState = s.copy(
+                    resultado = "Índice deve ser positivo",
+                    passos = listOf("Índice inválido"),
+                )
+            )
+            return
+        }
+
+        val passos = mutableListOf<String>()
+        passos.add("Calculando √[$indice]($radicando)")
+
+        // Decompor em fatores primos
+        val fatores = decomporFatores(radicando)
+        passos.add("Fatoração: $radicando = ${fatores.joinToString(" × ")}")
+
+        // Agrupar fatores
+        val grupos = mutableMapOf<Long, Int>()
+        fatores.forEach { grupos[it] = (grupos[it] ?: 0) + 1 }
+        passos.add("Agrupados: ${grupos.map { "${it.key}^${it.value}" }.joinToString(" × ")}")
+
+        // Simplificar
+        var resultadoParcial = 1L
+        var fatoresFora = mutableListOf<String>()
+        var fatoresDentro = mutableListOf<String>()
+
+        grupos.forEach { (fator, qtd) ->
+            val vezes = qtd / indice
+            val resto = qtd % indice
+            if (vezes > 0) {
+                resultadoParcial *= Math.pow(fator.toDouble(), vezes.toDouble()).toLong()
+                fatoresFora.add(if (vezes == 1) "$fator" else "$fator^$vezes")
+            }
+            if (resto > 0) {
+                fatoresDentro.add(if (resto == 1) "$fator" else "$fator^$resto")
+            }
+        }
+
+        val resultado = if (fatoresDentro.isEmpty()) {
+            passos.add("Resultado: $resultadoParcial (sem fatores restantes)")
+            resultadoParcial.toString()
+        } else {
+            passos.add("Simplificação: $resultadoParcial × √(${fatoresDentro.joinToString(" × ")})")
+            if (resultadoParcial == 1L) {
+                "√(${fatoresDentro.joinToString(" × ")})"
+            } else {
+                "$resultadoParcial√(${fatoresDentro.joinToString(" × ")})"
+            }
+        }
+
+        _uiState.value = _uiState.value.copy(
+            potenciacaoState = s.copy(
+                resultado = resultado,
+                passos = passos,
+            )
+        )
+    }
+
+    private fun decomporFatores(n: Long): List<Long> {
+        if (n <= 1) return emptyList()
+        val fatores = mutableListOf<Long>()
+        var resto = n
+        var divisor = 2L
+        while (divisor * divisor <= resto) {
+            while (resto % divisor == 0L) {
+                fatores.add(divisor)
+                resto /= divisor
+            }
+            divisor++
+        }
+        if (resto > 1) fatores.add(resto)
+        return fatores
     }
 }

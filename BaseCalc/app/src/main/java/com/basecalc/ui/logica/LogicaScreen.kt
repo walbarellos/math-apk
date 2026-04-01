@@ -63,10 +63,10 @@ import com.basecalc.core.logica.TipoFormula
 
 private val corVerdadeiro = Color(0xFF2E7D32)
 private val corFalso = Color(0xFFC62828)
+
+// Cores antigas mantidas para uso geral
 private val bgVerdadeiro = Color(0xFFE8F5E9)
 private val bgFalso = Color(0xFFFFEBEE)
-private val corResposta = Color(0xFF1565C0)
-private val bgResposta = Color(0xFFE3F2FD)
 
 // ─── Símbolos do teclado lógico ───────────────────────────────────────────────
 
@@ -456,13 +456,22 @@ private fun ColunaTabela(coluna: ColunaLogica, sepDireita: Boolean) {
         else -> 110.dp
     }
 
+    // Cores que funcionam em AMBOS os modos (light e dark):
+    val corResposta = MaterialTheme.colorScheme.primary
+    val bgRespostaHeader = MaterialTheme.colorScheme.primary
+    val fgRespostaHeader = MaterialTheme.colorScheme.onPrimary
+    val bgRespostaTrue = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+    val fgRespostaTrue = MaterialTheme.colorScheme.primary
+    val bgRespostaFalse = MaterialTheme.colorScheme.error.copy(alpha = 0.12f)
+    val fgRespostaFalse = MaterialTheme.colorScheme.error
+
     val bgHeader = when {
-        coluna.isResposta -> corResposta
+        coluna.isResposta -> bgRespostaHeader
         coluna.isVariavel -> MaterialTheme.colorScheme.surfaceVariant
         else -> MaterialTheme.colorScheme.surfaceVariant
     }
     val fgHeader = when {
-        coluna.isResposta -> Color.White
+        coluna.isResposta -> fgRespostaHeader
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
@@ -510,12 +519,16 @@ private fun ColunaTabela(coluna: ColunaLogica, sepDireita: Boolean) {
         // Células
         coluna.valores.forEachIndexed { linhaIdx, valor ->
             val bgCell = when {
-                coluna.isResposta && valor  -> bgResposta
-                coluna.isResposta && !valor -> bgFalso.copy(alpha = 0.4f)
-                valor  -> bgVerdadeiro.copy(alpha = 0.25f)
-                else   -> bgFalso.copy(alpha = 0.15f)
+                coluna.isResposta && valor  -> bgRespostaTrue
+                coluna.isResposta && !valor -> bgRespostaFalse
+                valor  -> Color(0xFF2E7D32).copy(alpha = 0.12f)
+                else   -> Color(0xFFC62828).copy(alpha = 0.08f)
             }
-            val fgCell = if (valor) corVerdadeiro else corFalso
+            val fgCell = when {
+                coluna.isResposta && valor  -> fgRespostaTrue
+                coluna.isResposta && !valor -> fgRespostaFalse
+                else -> if (valor) Color(0xFF2E7D32) else Color(0xFFC62828)
+            }
 
             Box(
                 modifier = Modifier
@@ -528,7 +541,7 @@ private fun ColunaTabela(coluna: ColunaLogica, sepDireita: Boolean) {
                     text = if (valor) "V" else "F",
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = FontFamily.Monospace,
-                        fontWeight = if (coluna.isResposta) FontWeight.ExtraBold else FontWeight.Bold,
+                        fontWeight = if (coluna.isResposta) FontWeight.Bold else FontWeight.Bold,
                         fontSize = if (coluna.isResposta) 15.sp else 13.sp,
                     ),
                     color = fgCell,
@@ -561,7 +574,7 @@ private fun LegendaCard() {
     ) {
         LegendaItem(cor = corVerdadeiro, bg = bgVerdadeiro, texto = "V = Verdadeiro")
         LegendaItem(cor = corFalso, bg = bgFalso, texto = "F = Falso")
-        LegendaItem(cor = corResposta, bg = bgResposta, texto = "Coluna resposta")
+        LegendaItem(cor = MaterialTheme.colorScheme.primary, bg = MaterialTheme.colorScheme.primaryContainer, texto = "Coluna resposta")
     }
 }
 

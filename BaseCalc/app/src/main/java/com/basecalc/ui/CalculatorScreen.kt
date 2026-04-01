@@ -15,9 +15,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.basecalc.*
 import com.basecalc.ui.components.*
-import com.basecalc.ui.conjuntos.ConjuntosScreen
+import com.basecalc.conjuntos.ConjuntoScreen
 import com.basecalc.ui.matrizes.MatrizesScreen
 import com.basecalc.ui.logica.LogicaScreen
+import com.basecalc.ui.potenciacao.PotenciacaoScreen
 
 // ─── Rótulos das abas ─────────────────────────────────────────────────────────
 
@@ -26,6 +27,7 @@ private fun rotuloAba(aba: AppTab) = when (aba) {
     AppTab.LOGICA      -> "Lógica"
     AppTab.CONJUNTOS   -> "Conjuntos"
     AppTab.MATRIZES    -> "Matrizes"
+    AppTab.POTENCIACAO -> "Pot/Rad"
     AppTab.GRAFICO     -> "Gráfico"
     AppTab.HISTORICO   -> "Histórico"
 }
@@ -48,6 +50,7 @@ fun CalculatorScreen(viewModel: CalcViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .padding(top = 8.dp)
             .pointerInput(Unit) {
                 detectTapGestures(onLongPress = { viewModel.toggleModoDiscreta() })
             }
@@ -112,9 +115,11 @@ fun CalculatorScreen(viewModel: CalcViewModel) {
 
                     AppTab.LOGICA -> LogicaScreen(viewModel = viewModel)
 
-                    AppTab.CONJUNTOS -> ConjuntosScreen(viewModel = viewModel)
+                    AppTab.CONJUNTOS -> ConjuntoScreen(viewModel = viewModel.conjuntoViewModel)
 
                     AppTab.MATRIZES -> MatrizesScreen(viewModel = viewModel)
+
+                    AppTab.POTENCIACAO -> PotenciacaoScreen(viewModel = viewModel)
 
                     AppTab.GRAFICO -> PainelGrafico(
                         resultado = result,

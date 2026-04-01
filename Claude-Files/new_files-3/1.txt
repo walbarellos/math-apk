@@ -1,0 +1,7 @@
+Sim, serve pra prova — mas pra integrar no app Android que já temos, é um módulo novo no BaseCalc. Deixa eu gerar os arquivos pra plugar direto.5 arquivos, plug-and-play no BaseCalc existente. O que veio:
+
+`ConjuntoEngine.kt` é o motor puro em Kotlin — sem nenhuma dependência Android, então roda no módulo `:core` igual ao `LogicaEngine` que você já tem. Ele faz ∪ ∩ − ᶜ com parser recursivo descendente, igual ao do motor lógico, e já retorna a `NotacaoFormal` com extensão, cardinalidade e pertinências prontas pra exibir.
+
+`ConjuntoEngineTest.kt` tem 28 testes cobrindo todos os exercícios 2a–2c, 3a–3j da sua lista, as questões V/F 4c–4g (incluindo De Morgan), pertinência e subconjunto. Roda com `./gradlew :core:test`.
+
+`ConjuntoScreen.kt` tem 3 abas: ∪∩− pra operações com os botões e os 13 exercícios prontos, ∈∉ pra verificar pertinência com justificativa textual, e ⊂⊄ pra subconjunto. O README `COMO_INTEGRAR.md` explica exatamente onde colar cada arquivo no projeto existente — é adicionar uma aba nova na navegação e chamar `ConjuntoScreen(viewModel)`.

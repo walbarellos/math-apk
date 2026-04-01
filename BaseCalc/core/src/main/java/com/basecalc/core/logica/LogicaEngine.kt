@@ -20,6 +20,7 @@ data class TabelaVerdade(
     val colunas: List<ColunaLogica>,
     val tipo: TipoFormula,
     val passos: List<String>,
+    val ok: Boolean = true,
 )
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────
@@ -42,27 +43,52 @@ fun tokenizar(input: String): List<Token> {
     while (i < input.length) {
         when {
             input[i].isWhitespace() -> i++
+
+            // Negação
+            input[i] in "¬~!" -> { tokens += Token.Neg; i++ }
+
+            // Conjunção
+            input[i] in "∧&" -> { tokens += Token.And; i++ }
+
+            // Disjunção unicode e pipe
+            input[i] == '∨' -> { tokens += Token.Or; i++ }
+            input[i] == '|' -> { tokens += Token.Or; i++ }
+
+            // 'v' isolado como ∨ — checar ANTES do bloco de variáveis
+            input[i] == 'v' && (i == 0 || !Character.isLetterOrDigit(input[i - 1])) &&
+                    (i + 1 >= input.length || !Character.isLetterOrDigit(input[i + 1])) -> {
+                tokens += Token.Or; i++
+            }
+
+            // XOR
+            input[i] == '⊕' -> { tokens += Token.Xor; i++ }
+
+            // Implicação unicode e ASCII
+            input[i] == '→' -> { tokens += Token.Impl; i++ }
+            input[i] == '-' && i + 1 < input.length && input[i + 1] == '>' -> {
+                tokens += Token.Impl; i += 2
+            }
+
+            // Bicondicional unicode e ASCII
+            input[i] == '↔' -> { tokens += Token.Bic; i++ }
+            input[i] == '<' && i + 2 < input.length
+                    && input[i + 1] == '-' && input[i + 2] == '>' -> {
+                tokens += Token.Bic; i += 3
+            }
+
+            // Parênteses
+            input[i] == '(' -> { tokens += Token.LP; i++ }
+            input[i] == ')' -> { tokens += Token.RP; i++ }
+
+            // Variáveis POR ÚLTIMO
             input[i].isLetter() -> {
-                // variáveis: p, q, r, p1, q2...
                 var j = i + 1
                 while (j < input.length && (input[j].isLetterOrDigit() || input[j] == '_')) j++
                 tokens += Token.Var(input.substring(i, j))
                 i = j
             }
-            input[i] in "¬~!" -> { tokens += Token.Neg; i++ }
-            input[i] in "∧&" -> { tokens += Token.And; i++ }
-            input[i] == '∨' -> { tokens += Token.Or; i++ }
-            input[i] == '⊕' -> { tokens += Token.Xor; i++ }
-            input[i] == '→' -> { tokens += Token.Impl; i++ }
-            input[i] == '↔' -> { tokens += Token.Bic; i++ }
-            input[i] == '(' -> { tokens += Token.LP; i++ }
-            input[i] == ')' -> { tokens += Token.RP; i++ }
-            // Alternativas ASCII
-            input[i] == '-' && i + 1 < input.length && input[i + 1] == '>' -> { tokens += Token.Impl; i += 2 }
-            input[i] == '<' && i + 2 < input.length && input[i+1] == '-' && input[i+2] == '>' -> { tokens += Token.Bic; i += 3 }
-            input[i] == '|' -> { tokens += Token.Or; i++ }
-            input[i] == 'v' && (i == 0 || !input[i-1].isLetter()) -> { tokens += Token.Or; i++ }  // 'v' isolado como ∨
-            else -> i++
+
+            else -> i++ // ignora caracteres desconhecidos
         }
     }
     return tokens
@@ -242,9 +268,11 @@ object LogicaEngine {
         val numLinhas = 1 shl n   // 2^n
 
         // Atribuições: linha i → mapa variável→valor
+        // Iterar de numLinhas-1 downTo 0 para gerar VV, VF, FV, FF (padrão BR)
         val atribuicoes: List<Map<String, Boolean>> = (0 until numLinhas).map { i ->
+            val row = numLinhas - 1 - i
             variaveis.mapIndexed { idx, v ->
-                v to ((i shr (n - 1 - idx)) and 1 == 1)
+                v to (((row shr (n - 1 - idx)) and 1) == 1)
             }.toMap()
         }
 
