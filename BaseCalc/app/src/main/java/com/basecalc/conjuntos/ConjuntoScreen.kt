@@ -35,6 +35,7 @@ fun ConjuntoScreen(viewModel: ConjuntoViewModel) {
             ModoConjunto.OPERACAO    -> OperacaoPane(state, viewModel)
             ModoConjunto.PERTINENCIA -> PertinenciaPane(state, viewModel)
             ModoConjunto.SUBCONJUNTO -> SubconjuntoPane(state, viewModel)
+            ModoConjunto.EXERCICIO1  -> Exercicio1Pane(state)
         }
     }
 }
@@ -47,6 +48,7 @@ private fun ModoTabs(modo: ModoConjunto, onChange: (ModoConjunto) -> Unit) {
         ModoConjunto.OPERACAO    to "∪ ∩ −",
         ModoConjunto.PERTINENCIA to "∈ ∉",
         ModoConjunto.SUBCONJUNTO to "⊂ ⊄",
+        ModoConjunto.EXERCICIO1  to "Ex.1",
     )
     Row(
         modifier = Modifier
@@ -296,106 +298,128 @@ private fun OpKey(sym: String, sub: String, color: Color, modifier: Modifier, on
 
 @Composable
 private fun ResultadoCard(r: ConjuntoResult) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(
-            1.5.dp,
-            when (r) {
-                is ConjuntoResult.Ok    -> MaterialTheme.colorScheme.primary
-                is ConjuntoResult.Erro  -> MaterialTheme.colorScheme.error
-            }
-        ),
-    ) {
-        Column(modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            when (r) {
-                is ConjuntoResult.Erro -> Text(r.message,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium)
-                is ConjuntoResult.Ok -> {
-                    val n = r.notation
-                    // Resultado principal
+    when (r) {
+        is ConjuntoResult.Erro -> Card(
+            modifier = Modifier.fillMaxWidth(),
+            border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.error),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(r.message, modifier = Modifier.padding(14.dp),
+                color = MaterialTheme.colorScheme.error)
+        }
+        is ConjuntoResult.Ok -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // ── Caixa de resposta final ──────────────────────────────────
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF2E7D32).copy(.08f)
+                ),
+                border = BorderStroke(2.dp, Color(0xFF2E7D32))
+            ) {
+                Column(modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("RESPOSTA", fontSize = 10.sp,
+                        fontFamily = FontFamily.Monospace,
+                        color = Color(0xFF2E7D32).copy(.7f),
+                        letterSpacing = 1.5.sp)
                     Text(
-                        text  = n.extensao,
-                        style = MaterialTheme.typography.titleLarge.copy(
+                        "${r.expression} = ${r.notation.extensao}",
+                        style = MaterialTheme.typography.headlineMedium.copy(
                             fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.Normal,
-                            color      = if (n.vazio) MaterialTheme.colorScheme.onSurface.copy(.5f)
-                                         else Color(0xFF2E7D32)
+                            color = Color(0xFF2E7D32)
                         )
                     )
-                    // Notação formal
-                    NotacaoBox(r)
-                    // Passos
-                    if (r.steps.isNotEmpty()) PassosBox(r.steps)
+                    Text(
+                        "n(${r.expression}) = ${r.notation.cardinalidade}",
+                        fontFamily = FontFamily.Monospace, fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(.5f)
+                    )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun NotacaoBox(r: ConjuntoResult.Ok) {
-    val n = r.notation
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("notação formal", style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(.5f))
-            // Extensão
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                Text("(${r.expression}) =", fontFamily = FontFamily.Monospace,
-                    fontSize = 13.sp, color = MaterialTheme.colorScheme.primary)
-                Text(n.extensao, fontFamily = FontFamily.Monospace,
-                    fontSize = 13.sp, color = Color(0xFF2E7D32))
-            }
-            // Cardinalidade
-            Text("n(${r.expression}) = ${n.cardinalidade}",
-                fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(.6f))
-            // Vazio
-            if (n.vazio) Text("(${r.expression}) = ∅",
-                fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.error)
-            // Pertinências (se poucos elementos)
-            if (n.pertinencias.isNotEmpty()) {
-                Text(n.pertinencias.take(6).joinToString("   "),
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(.5f),
-                    lineHeight = 18.sp)
+            // ── Passos ────────────────────────────────────────────────────
+            if (r.steps.isNotEmpty()) {
+                Text("  resolução passo a passo ↓",
+                    fontSize = 11.sp, fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSurface.copy(.35f))
+                r.steps.forEachIndexed { i, s -> StepExplicado(i + 1, s) }
             }
         }
     }
 }
 
 @Composable
-private fun PassosBox(steps: List<Step>) {
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(.5.dp, MaterialTheme.colorScheme.outlineVariant),
-        modifier = Modifier.fillMaxWidth()
+private fun StepExplicado(num: Int, s: Step) {
+    val lhs = ConjuntoEngine.formatSet(s.esquerda)
+    val rhs = s.direita?.let { ConjuntoEngine.formatSet(it) }
+    val res = ConjuntoEngine.formatSet(s.resultado)
+
+    val cor = when (s.operacao) {
+        "∪" -> Color(0xFF185FA5)
+        "∩" -> Color(0xFF2E7D32)
+        "−" -> Color(0xFFBA7517)
+        "ᶜ" -> Color(0xFF534AB7)
+        else -> Color(0xFF666666)
+    }
+
+    val (titulo, regra, calculo) = when (s.operacao) {
+        "∪" -> Triple(
+            "União  ∪  (REUNIÃO)",
+            "Junte TODOS os elementos dos dois conjuntos em um só, sem repetir nenhum.",
+            "$lhs\n∪  $rhs\n=  $res"
+        )
+        "∩" -> Triple(
+            "Intersecção  ∩",
+            "Fique só com os elementos que aparecem nos DOIS conjuntos ao mesmo tempo.",
+            "$lhs\n∩  $rhs\n=  $res"
+        )
+        "−" -> Triple(
+            "Diferença  −",
+            "Pegue o 1º conjunto e RISQUE os elementos que também estão no 2º.\n⚠ A ordem importa: A−B ≠ B−A",
+            "$lhs\n−  $rhs\n=  $res"
+        )
+        "ᶜ" -> Triple(
+            "Complementar  ᶜ  (também escrito como Ā ou Cᴬᵤ)",
+            "Pegue o Universo U e RETIRE os elementos do conjunto.\nO complementar é tudo que está em U mas NÃO está no conjunto.",
+            "U − $lhs\n=  $res"
+        )
+        else -> Triple(s.operacao, "", "$lhs = $res")
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, cor.copy(.3f)),
+        colors = CardDefaults.cardColors(containerColor = cor.copy(.05f))
     ) {
-        Column(modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("passos", style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(.5f))
-            steps.forEach { s ->
-                val direita = s.direita?.let { ConjuntoEngine.formatSet(it) } ?: ""
-                val lhs = ConjuntoEngine.formatSet(s.esquerda)
-                val res = ConjuntoEngine.formatSet(s.resultado)
-                val stepStr = if (s.direita != null)
-                    "$lhs ${s.operacao} $direita = $res"
-                else
-                    "${s.operacao}($lhs) = $res"
-                Text(stepStr, fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(.7f), lineHeight = 18.sp)
+        Column(modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)) {
+
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Surface(shape = RoundedCornerShape(4.dp), color = cor) {
+                    Text("  $num  ", color = Color.White,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+                Text(titulo, fontFamily = FontFamily.Monospace,
+                    fontSize = 13.sp, fontWeight = FontWeight.Bold, color = cor)
+            }
+
+            Text(regra,
+                fontFamily = FontFamily.Monospace, fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(.7f),
+                lineHeight = 18.sp)
+
+            Surface(shape = RoundedCornerShape(6.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxWidth()) {
+                Text(calculo,
+                    modifier = Modifier.padding(12.dp),
+                    fontFamily = FontFamily.Monospace, fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    lineHeight = 24.sp)
             }
         }
     }
@@ -602,37 +626,149 @@ private fun SubconjuntoPane(state: ConjuntoUiState, vm: ConjuntoViewModel) {
 @Composable
 private fun SubsetCard(r: SubsetResult) {
     val color = if (r.contido) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error
+    val simbolo = if (r.contido) "⊂" else "⊄"
+    val simboloReverso = if (r.contido) "⊃" else "⊅"
+    val textoA = if (r.contido)
+        "${r.nomeA} está contido em ${r.nomeB}"
+    else
+        "${r.nomeA} NÃO está contido em ${r.nomeB}"
+    val textoB = if (r.contido)
+        "${r.nomeB} contém ${r.nomeA}"
+    else
+        "${r.nomeB} NÃO contém ${r.nomeA}"
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         border = BorderStroke(1.5.dp, color),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(r.notacao, style = MaterialTheme.typography.headlineSmall.copy(
-                fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Normal,
-                color = color))
-            Text(if (r.contido) "VERDADEIRO" else "FALSO",
-                style = MaterialTheme.typography.labelMedium, color = color)
-            Surface(shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("${r.nomeA} = ${ConjuntoEngine.formatSet(r.conjA)}",
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(.7f))
-                    Text("${r.nomeB} = ${ConjuntoEngine.formatSet(r.conjB)}",
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(.7f))
-                    Text(r.justificativa,
+        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Notação principal: A ⊂ B  e  B ⊃ A
+            Row(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "${r.nomeA} $simbolo ${r.nomeB}",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Normal, color = color
+                    )
+                )
+                Text(
+                    "${r.nomeB} $simboloReverso ${r.nomeA}",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = FontFamily.Monospace, color = color.copy(.6f)
+                    )
+                )
+            }
+            // Texto humano simples
+            Text(textoA, fontFamily = FontFamily.Monospace, fontSize = 13.sp, color = color.copy(.9f))
+            Text(textoB, fontFamily = FontFamily.Monospace, fontSize = 13.sp, color = color.copy(.75f))
+            // Só mostra detalhe se falso
+            if (!r.contido && r.elementosFaltando.isNotEmpty()) {
+                Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
+                    Text(
+                        "elementos de ${r.nomeA} que faltam em ${r.nomeB}: {${r.elementosFaltando.joinToString(", ")}}",
+                        modifier = Modifier.padding(10.dp),
                         fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(.6f),
-                        lineHeight = 18.sp)
-                    if (r.elementosFaltando.isNotEmpty()) {
-                        Text("faltam: {${r.elementosFaltando.joinToString(", ")}}",
-                            fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.error)
+                        color = MaterialTheme.colorScheme.error, lineHeight = 18.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+// ── Exercício 1 da Apostila ───────────────────────────────────────────────────
+
+@Composable
+private fun Exercicio1Pane(state: ConjuntoUiState) {
+    val sets = state.conjuntos.mapValues { ConjuntoEngine.parseSet(it.value) }
+
+    data class Item(val label: String, val left: String, val right: String, val tipo: String)
+    val itens = listOf(
+        Item("a)", "4",  "A", "elem"),
+        Item("b)", "11", "C", "elem"),
+        Item("c)", "D",  "U", "sub"),
+        Item("d)", "C",  "A", "sub"),
+        Item("e)", "E",  "B", "sub"),
+        Item("f)", "6",  "D", "elem"),
+        Item("g)", "12", "E", "elem"),
+        Item("h)", "U",  "A", "sub"),
+    )
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            Text("Complete com ∈, ∉, ⊂ ou ⊄",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(.5f))
+        }
+        items(itens) { item ->
+            val conj1 = sets[item.left]
+            val conj2 = sets[item.right] ?: emptySet()
+            val conj1fmt = if (conj1 != null) ConjuntoEngine.formatSet(conj1) else item.left
+            val conj2fmt = ConjuntoEngine.formatSet(conj2)
+
+            val (simbolo, verdadeiro, explicacao) = if (item.tipo == "elem") {
+                val pertence = conj2.contains(item.left)
+                Triple(
+                    if (pertence) "∈" else "∉",
+                    pertence,
+                    if (pertence)
+                        "${item.left} está dentro de ${item.right} = $conj2fmt\n→ usa ∈ (pertence)"
+                    else
+                        "${item.left} NÃO está em ${item.right} = $conj2fmt\n→ usa ∉ (não pertence)"
+                )
+            } else {
+                val cA = conj1 ?: emptySet()
+                val contido = cA.all { it in conj2 }
+                val faltando = (cA - conj2).toList()
+                Triple(
+                    if (contido) "⊂" else "⊄",
+                    contido,
+                    if (contido)
+                        "${item.left} = $conj1fmt\n${item.right} = $conj2fmt\nTodos os elementos de ${item.left} estão em ${item.right}.\n→ usa ⊂ (está contido)"
+                    else
+                        "${item.left} = $conj1fmt\n${item.right} = $conj2fmt\nOs elementos {${faltando.joinToString(", ")}} estão em ${item.left} mas NÃO estão em ${item.right}.\n→ usa ⊄ (não está contido)"
+                )
+            }
+
+            val cor = if (verdadeiro) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(1.5.dp, cor.copy(.4f))
+            ) {
+                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(item.label, fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(.4f))
+                        // RESPOSTA EM DESTAQUE
+                        Text(
+                            "${item.left} $simbolo ${item.right}",
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Normal,
+                                color = cor
+                            )
+                        )
+                    }
+                    // EXPLICAÇÃO SIMPLES
+                    Surface(shape = RoundedCornerShape(6.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            explicacao,
+                            modifier = Modifier.padding(10.dp),
+                            fontFamily = FontFamily.Monospace, fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(.7f),
+                            lineHeight = 18.sp
+                        )
                     }
                 }
             }

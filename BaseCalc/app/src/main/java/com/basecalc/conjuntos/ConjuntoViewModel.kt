@@ -5,7 +5,7 @@ import com.basecalc.core.conjuntos.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-enum class ModoConjunto { OPERACAO, PERTINENCIA, SUBCONJUNTO }
+enum class ModoConjunto { OPERACAO, PERTINENCIA, SUBCONJUNTO, EXERCICIO1 }
 
 data class ConjuntoUiState(
     val conjuntos: Map<String, String> = defaultSets(),
