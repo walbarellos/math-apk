@@ -1,5 +1,7 @@
 # BaseCalc — Calculadora Multi-Base para Estudantes
 
+*Um Aplicativo amigo para as horas dificeis que são as aulas do Professor Paulo. Te amo professor! Com carinho a você e Tierri. "Boa tarde Tierri!" ♡ *
+
 Calculadora Android que exibe resultados simultaneamente nas bases 2, 3, 4, 5, 6, 7, 8, 9, 10 e 16,
 com passo a passo das divisões para sala de aula.
 
