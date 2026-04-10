@@ -60,8 +60,9 @@ fun tokenizar(input: String): List<Token> {
                 tokens += Token.Or; i++
             }
 
-            // XOR
-            input[i] == '⊕' -> { tokens += Token.Xor; i++ }
+            // XOR (Ou Exclusivo)
+            input[i] == '⊻' || input[i] == '⊕' || input[i] == '^' -> { tokens += Token.Xor; i++ }
+            input.startsWith("xor", i, ignoreCase = true) -> { tokens += Token.Xor; i += 3 }
 
             // Implicação unicode e ASCII
             input[i] == '→' -> { tokens += Token.Impl; i++ }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -35,8 +36,10 @@ private fun rotuloAba(aba: AppTab) = when (aba) {
 // ─── Tela principal ───────────────────────────────────────────────────────────
 
 @Composable
-fun CalculatorScreen(viewModel: CalcViewModel) {
-    val state by viewModel.uiState.collectAsState()
+fun CalculatorScreen(
+    viewModel: CalcViewModel,
+    state: CalcUiState
+) {
     val result = state.result
     val showSteps = state.showStepsForBase
     val history = state.history
@@ -45,12 +48,14 @@ fun CalculatorScreen(viewModel: CalcViewModel) {
     val colorMode = state.colorMode
     val reduceMotion = state.reduceMotion
     val hapticsEnabled = state.hapticsEnabled
+    val tabStateHolder = rememberSaveableStateHolder()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = 8.dp)
+            .statusBarsPadding()
+            .padding(top = 6.dp)
             .pointerInput(Unit) {
                 detectTapGestures(onLongPress = { viewModel.toggleModoDiscreta() })
             }
@@ -93,18 +98,10 @@ fun CalculatorScreen(viewModel: CalcViewModel) {
             }
         }
 
-        // Conteúdo da aba ativa
+        // Conteúdo da aba ativa com preservação de estado por aba
         Box(modifier = Modifier.weight(1f)) {
-            AnimatedContent(
-                targetState = state.activeTab,
-                transitionSpec = {
-                    val enter = if (reduceMotion) fadeIn(tween(0)) else fadeIn(tween(200))
-                    val exit = if (reduceMotion) fadeOut(tween(0)) else fadeOut(tween(100))
-                    enter togetherWith exit
-                },
-                label = "troca_aba",
-            ) { aba ->
-                when (aba) {
+            tabStateHolder.SaveableStateProvider(state.activeTab.name) {
+                when (state.activeTab) {
                     AppTab.CALCULADORA -> PainelResultados(
                         result = result,
                         showStepsForBase = showSteps,
@@ -112,22 +109,16 @@ fun CalculatorScreen(viewModel: CalcViewModel) {
                         colorMode = colorMode,
                         modifier = Modifier.fillMaxSize(),
                     )
-
                     AppTab.LOGICA -> LogicaScreen(viewModel = viewModel)
-
                     AppTab.CONJUNTOS -> ConjuntoScreen(viewModel = viewModel.conjuntoViewModel)
-
                     AppTab.MATRIZES -> MatrizesScreen(viewModel = viewModel)
-
                     AppTab.POTENCIACAO -> PotenciacaoScreen(viewModel = viewModel)
-
                     AppTab.GRAFICO -> PainelGrafico(
                         resultado = result,
                         colorMode = colorMode,
                         reduceMotion = reduceMotion,
                         modifier = Modifier.fillMaxSize(),
                     )
-
                     AppTab.HISTORICO -> PainelHistorico(
                         historico = history,
                         hapticsEnabled = hapticsEnabled,
@@ -198,7 +189,7 @@ private fun DisplayExpressao(expressao: String, erro: String?) {
 
 @Composable
 private fun BaseSelector(selectedBase: Int, onBaseSelected: (Int) -> Unit) {
-    val bases = listOf(2, 8, 10, 16)
+    val bases = remember { (2..16).toList() }
     Row(
         modifier = Modifier
             .fillMaxWidth()

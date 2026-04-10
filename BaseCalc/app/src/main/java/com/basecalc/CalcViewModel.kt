@@ -47,13 +47,17 @@ class CalcViewModel(
     }
 
     private fun carregarHistorico() {
-        try {
-            val repository = AppContainer.getHistoryRepository()
-            val historyEntries = repository.loadHistory()
-            val history = historyEntries.map { HistoricoItem(it.expression, it.result) }
-            _uiState.value = _uiState.value.copy(history = history)
-        } catch (e: Exception) {
-            // Silently fail if repository not available
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val repository = AppContainer.getHistoryRepository()
+                val historyEntries = repository.loadHistory()
+                val history = historyEntries.map { HistoricoItem(it.expression, it.result) }
+                withContext(Dispatchers.Main) {
+                    _uiState.value = _uiState.value.copy(history = history)
+                }
+            } catch (e: Exception) {
+                // Silently fail if repository not available
+            }
         }
     }
 
@@ -146,11 +150,13 @@ class CalcViewModel(
     }
 
     private fun persistirHistorico(history: List<HistoricoItem>) {
-        try {
-            val entries = history.map { HistoryEntry(it.expressao, it.resultadoDecimal) }
-            AppContainer.getHistoryRepository().saveHistory(entries)
-        } catch (e: Exception) {
-            // Silently fail
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val entries = history.map { HistoryEntry(it.expressao, it.resultadoDecimal) }
+                AppContainer.getHistoryRepository().saveHistory(entries)
+            } catch (e: Exception) {
+                // Silently fail
+            }
         }
     }
 

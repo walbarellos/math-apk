@@ -458,6 +458,36 @@ class LogicaEngineTest {
     }
 
     @Test
+    fun `aceita string xor case insensitive`() {
+        val r1 = LogicaEngine.avaliar("p XOR q")
+        val r2 = LogicaEngine.avaliar("p ⊕ q")
+        assertTrue(r1.ok)
+        assertEquals(
+            r2.colunas.first { it.isResposta }.valores,
+            r1.colunas.first { it.isResposta }.valores
+        )
+    }
+
+    @Test
+    fun `aceita chapeu como xor`() {
+        val r1 = LogicaEngine.avaliar("p ^ q")
+        val r2 = LogicaEngine.avaliar("p ⊕ q")
+        assertTrue(r1.ok)
+        assertEquals(
+            r2.colunas.first { it.isResposta }.valores,
+            r1.colunas.first { it.isResposta }.valores
+        )
+    }
+
+    @Test
+    fun `aceita simbolo v com traco como xor`() {
+        val r = LogicaEngine.avaliar("p ⊻ q")
+        assertTrue(r.ok)
+        val resp = r.colunas.first { it.isResposta }
+        assertEquals(listOf(false, true, true, false), resp.valores)
+    }
+
+    @Test
     fun `formula invalida nao crasha`() {
         try {
             val r = LogicaEngine.avaliar("p ∧ (q")

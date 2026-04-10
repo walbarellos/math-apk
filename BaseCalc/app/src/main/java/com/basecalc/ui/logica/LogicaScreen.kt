@@ -76,7 +76,7 @@ private val teclado1 = listOf(
     SimboloKey("¬", "¬", "NÃO"),
     SimboloKey("∧", "∧", "E"),
     SimboloKey("∨", "∨", "OU"),
-    SimboloKey("⊕", "⊕", "XOR"),
+    SimboloKey("⊻", "⊻", "OU EXC."),
     SimboloKey("→", "→", "SE...ENTÃO"),
     SimboloKey("↔", "↔", "SE E SÓ SE"),
 )

@@ -1,0 +1,20 @@
+wing: basecalc
+rooms:
+- name: core
+  description: Files from core/
+  keywords:
+  - core
+  - core
+- name: app
+  description: Files from app/
+  keywords:
+  - app
+  - app
+- name: gradle
+  description: Files from gradle/
+  keywords:
+  - gradle
+  - gradle
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []
