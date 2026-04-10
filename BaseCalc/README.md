@@ -15,12 +15,12 @@ Imagens atuais em `docs/images/`:
 - `tabela-verdade.png`
 - `conjuntos-venn.png`
 - `tabela-resultado-verdade.png`
-- `alguma-coisa-traumatica.png`
+- `calculadora-home.png`
 
 ![Tabela Verdade](./docs/images/tabela-verdade.png)
 ![Conjuntos Venn](./docs/images/conjuntos-venn.png)
 ![Tabela Resultado Verdade](./docs/images/tabela-resultado-verdade.png)
-![Tela Extra](./docs/images/alguma-coisa-traumatica.png)
+![Calculadora Home](./docs/images/calculadora-home.png)
 
 ## Estado Atual (Oficial)
 - Base de entrada configurável de `b2` até `b16`.

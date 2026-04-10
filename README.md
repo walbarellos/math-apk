@@ -3,6 +3,19 @@
 Calculadora Android que exibe resultados simultaneamente nas bases 2, 3, 4, 5, 6, 7, 8, 9, 10 e 16,
 com passo a passo das divisões para sala de aula.
 
+## Screenshots
+
+As imagens ficam em `BaseCalc/docs/images/`:
+- `tabela-verdade.png`
+- `conjuntos-venn.png`
+- `tabela-resultado-verdade.png`
+- `calculadora-home.png`
+
+![Tabela Verdade](./BaseCalc/docs/images/tabela-verdade.png)
+![Conjuntos Venn](./BaseCalc/docs/images/conjuntos-venn.png)
+![Tabela Resultado Verdade](./BaseCalc/docs/images/tabela-resultado-verdade.png)
+![Calculadora Home](./BaseCalc/docs/images/calculadora-home.png)
+
 ---
 
 ## Estrutura do projeto
