@@ -178,3 +178,7 @@ Para mudanças seguras:
 
 ## Licença
 Uso interno do projeto (não há arquivo de licença dedicado neste repositório).
+
+## Autores e Créditos
+- **Autor principal:** Walbarellos
+- **Assistente técnico:** ChatGPT

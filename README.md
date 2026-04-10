@@ -110,3 +110,10 @@ Suporta `+  -  *  /  %  (  )` e números decimais.
 O exercício c) da lista 2 contém um erro: o dígito **7** não existe em base 4
 (dígitos válidos: 0, 1, 2, 3). Provavelmente o enunciado deveria ser **(171)₈**,
 que equivale a 121 em decimal. Confirme com o professor.
+
+---
+
+## Autores e Créditos
+
+- **Autor principal:** Walbarellos
+- **Assistente técnico:** ChatGPT
