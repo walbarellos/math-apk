@@ -1,61 +1,180 @@
-# BaseCalc — Calculadora Multi-Base com Precisão Exata
+# BaseCalc
 
-Aplicativo Android para estudantes que avalia expressões e mostra o resultado em múltiplas bases com passos.
-O motor é 100% Kotlin e utiliza **números racionais exatos** (sem arredondamento).
+Calculadora Android (Jetpack Compose) com foco em uso escolar/prova, cobrindo:
+- cálculo multi-base com precisão racional,
+- lógica proposicional,
+- conjuntos (incluindo Venn interativo),
+- matrizes,
+- potenciação/radiciação,
+- histórico e gráfico.
 
-## Requisitos Funcionais (RF)
-1. Avaliar expressões com `+ - * / %` e parênteses.
-2. Exibir resultado nas bases 2, 3, 4, 5, 6, 7, 8, 9, 10 e 16.
-3. Mostrar passos de divisão sucessiva para conversão de base.
-4. Detectar dízima periódica na parte fracionária.
-5. Validar e converter números informados em qualquer base suportada.
+Projeto modularizado em `app` (UI/ViewModel) e `core` (motor matemático/lógico).
 
-## Requisitos Não Funcionais (RNF)
-1. Precisão exata por racional (sem ponto flutuante).
-2. Modularização em camadas (motor isolado do app).
-3. Nomenclatura clara e funções com responsabilidade única.
-4. Baixo acoplamento entre UI e motor.
-5. Tempo de resposta adequado para uso em sala (cálculo local).
+## Screenshots
+Imagens atuais em `docs/images/`:
+- `tabela-verdade.png`
+- `conjuntos-venn.png`
+- `tabela-resultado-verdade.png`
+- `alguma-coisa-traumatica.png`
 
-## Arquitetura (Sommerville: separação de preocupações)
-- **core**: motor matemático (Rational, parser, conversão, modelos).
-- **app**: UI Compose, ViewModel e tema.
+![Tabela Verdade](./docs/images/tabela-verdade.png)
+![Conjuntos Venn](./docs/images/conjuntos-venn.png)
+![Tabela Resultado Verdade](./docs/images/tabela-resultado-verdade.png)
+![Tela Extra](./docs/images/alguma-coisa-traumatica.png)
 
-## Estrutura do projeto
-```
+## Estado Atual (Oficial)
+- Base de entrada configurável de `b2` até `b16`.
+- Abas principais: `Calculadora`, `Lógica`, `Conjuntos`, `Matrizes`, `Pot/Rad`, `Gráfico`, `Histórico`.
+- Módulo de conjuntos ativo em: `com.basecalc.conjuntos.ConjuntoScreen`.
+- Venn no modo "Pelo Problema" (único modo ativo):
+  - preenchimento por totais do enunciado,
+  - sincronização visual no diagrama em tempo real,
+  - toque em região para focar campo correspondente,
+  - auto-resolução das regiões,
+  - verificação de soma,
+  - bloco de respostas automáticas.
+
+## Arquitetura
+
+### `core/`
+Motor puro Kotlin, sem dependência de UI:
+- Conversão de bases: `conversion/*`
+- Parser/engine da calculadora: `parser/*`, `engine/*`
+- Lógica proposicional: `logica/LogicaEngine.kt`
+- Teoria dos conjuntos: `conjuntos/ConjuntoEngine.kt`
+- Modelos de resultado/steps: `model/*`
+- Racional exato: `number/Rational.kt`
+
+### `app/`
+Camada Android/Compose:
+- Entrada principal: `MainActivity.kt`
+- Estado global e navegação por abas: `CalcUiState.kt`, `CalcViewModel.kt`, `ui/CalculatorScreen.kt`
+- Componentes de UI: `ui/components/*`
+- Módulos de tela:
+  - `conjuntos/ConjuntoScreen.kt` (ativo para conjuntos/Venn)
+  - `ui/logica/LogicaScreen.kt`
+  - `ui/matrizes/MatrizesScreen.kt`
+  - `ui/potenciacao/PotenciacaoScreen.kt`
+
+## Estrutura de Pastas
+
+```text
 BaseCalc/
 ├── app/
 │   ├── src/main/java/com/basecalc/
-│   │   ├── CalcModels.kt
+│   │   ├── MainActivity.kt
+│   │   ├── CalcUiState.kt
 │   │   ├── CalcViewModel.kt
-│   │   └── MainActivity.kt
-│   └── src/main/java/com/basecalc/ui/
-│       ├── CalculatorScreen.kt
-│       └── theme/
-│           ├── BaseCalcTheme.kt
-│           └── Typography.kt
+│   │   ├── conjuntos/
+│   │   │   ├── ConjuntoScreen.kt
+│   │   │   └── ConjuntoViewModel.kt
+│   │   ├── ui/
+│   │   │   ├── CalculatorScreen.kt
+│   │   │   ├── components/
+│   │   │   ├── logica/
+│   │   │   ├── matrizes/
+│   │   │   └── potenciacao/
+│   │   └── data/
+│   └── build.gradle.kts
 ├── core/
-│   └── src/main/java/com/basecalc/core/
-│       ├── conversion/
-│       ├── engine/
-│       ├── model/
-│       ├── number/
-│       ├── parser/
-│       └── util/
-└── gradle/
+│   ├── src/main/java/com/basecalc/core/
+│   │   ├── conjuntos/
+│   │   ├── conversion/
+│   │   ├── engine/
+│   │   ├── logica/
+│   │   ├── model/
+│   │   ├── number/
+│   │   └── parser/
+│   └── src/test/java/com/basecalc/core/
+├── gradle/
+├── settings.gradle.kts
+└── README.md
 ```
 
-## Como rodar
-1. Abra o Android Studio.
-2. `File > Open` e selecione a pasta `BaseCalc/`.
-3. Aguarde o Gradle sincronizar (vai baixar dependências).
-4. Conecte um dispositivo ou inicie um emulador.
-5. Clique em **Run**.
+## Como Executar
 
-## Observações
-- Dígitos válidos em base 4: `0, 1, 2, 3`. Portanto `(171)₄` é inválido.
-- A parte fracionária é exibida **sem arredondamento**; se não houver término, a dízima é marcada.
+### Android Studio
+1. Abra `BaseCalc/`.
+2. Aguarde sync do Gradle.
+3. Rode em dispositivo/emulador.
+
+### Linha de comando
+- Compilar Kotlin do app:
+```bash
+./gradlew :app:compileDebugKotlin
+```
+- Gerar APK debug:
+```bash
+./gradlew :app:assembleDebug
+```
+- APK gerado em:
+```text
+app/build/outputs/apk/debug/app-debug.apk
+```
 
 ## Testes
-- Testes unitários do motor em `core/src/test/java`.
-- Execute: `./gradlew :core:test`.
+
+Rodar testes do core:
+```bash
+./gradlew :core:test
+```
+
+Suíte atual inclui:
+- `BaseCalcEngineTest`
+- `ConjuntoEngineTest`
+- `ConjuntoVennTest`
+- `LogicaEngineTest`
+
+## Venn (Uso Rápido para Prova)
+
+Tela: `Conjuntos -> Venn`.
+
+Preencha os campos do enunciado:
+- `U`, `A`, `B`, `C`, `A∩B`, `A∩C`, `B∩C`, `A∩B∩C`.
+
+Comportamento:
+- Campos iniciam em `0` para acelerar digitação de prova.
+- O diagrama exibe os valores conforme os campos são preenchidos.
+- Ao tocar em uma região no diagrama, o app foca o campo correspondente.
+- Botão "Calcular e preencher diagrama" resolve as 8 regiões.
+- Se `A∩B∩C` ficar em branco, é tratado como `0`.
+
+## Performance (Resumo do que já foi aplicado)
+- Cache de parse de conjuntos no `ConjuntoViewModel`.
+- Cálculo de exercício com emissão única de estado.
+- Persistência de estado de abas com `SaveableStateHolder`.
+- I/O de histórico movido para `Dispatchers.IO`.
+- Ajustes de recomposição e desenho no Venn.
+
+Arquivo de referência interna:
+- `PERF_TUNING_2026-04-09.md`
+
+## MemPalace (Memória Operacional)
+- Palace local deste workspace: `../.mempalace/palace`
+- Configuração local do projeto: `mempalace.yaml`
+- Comandos úteis:
+```bash
+/tmp/mempalace-venv/bin/mempalace --palace /home/walbarellos/mathwork/.mempalace/palace status
+/tmp/mempalace-venv/bin/mempalace --palace /home/walbarellos/mathwork/.mempalace/palace mine /home/walbarellos/mathwork/BaseCalc
+/tmp/mempalace-venv/bin/mempalace --palace /home/walbarellos/mathwork/.mempalace/palace search "venn performance"
+```
+
+## Limitações Conhecidas
+- Ainda há warnings menores de parâmetros não usados em alguns composables.
+- O projeto possui telas legadas em `app/src/main/java/com/basecalc/ui/conjuntos/ConjuntosScreen.kt`, mas o fluxo ativo de conjuntos está em `com.basecalc.conjuntos.ConjuntoScreen`.
+
+## Guia de Contribuição Interna
+Para mudanças seguras:
+1. Altere apenas o módulo alvo (`app` ou `core`).
+2. Rode no mínimo:
+```bash
+./gradlew :app:compileDebugKotlin
+./gradlew :core:test
+```
+3. Gere APK debug quando houver mudança de UI:
+```bash
+./gradlew :app:assembleDebug
+```
+
+## Licença
+Uso interno do projeto (não há arquivo de licença dedicado neste repositório).
